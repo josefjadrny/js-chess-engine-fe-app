@@ -2,7 +2,7 @@
 
 A browser-based demo app for [js-chess-engine](https://github.com/nicfab/js-chess-engine) — play chess against AI entirely in your browser with no server required. Everything, including the AI, runs client-side in JavaScript.
 
-**Live demo:** [chess-fe.josefjadrny.info](http://chess-fe.josefjadrny.info/)
+**Live demo:** http://chess-fe.josefjadrny.info/
 
 ## Features
 
