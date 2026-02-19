@@ -1,16 +1,36 @@
-# React + Vite
+# js-chess-engine Browser Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based demo app for [js-chess-engine](https://github.com/nicfab/js-chess-engine) — play chess against AI entirely in your browser with no server required. Everything, including the AI, runs client-side in JavaScript.
 
-Currently, two official plugins are available:
+**Live demo:** [chess-fe.josefjadrny.info](http://chess-fe.josefjadrny.info/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Human vs AI** — play as White against the AI (Black)
+- **Predefined AI levels (1–5)** — quick difficulty selection from beginner to advanced
+- **Custom AI configuration** — fine-tune the engine parameters:
+  - Search depth
+  - Extended search depth
+  - Quiescence search depth
+  - Check extension toggle
+  - Transposition table (TT) memory size (MB)
+- **Move highlighting** — valid moves and last move are visually indicated on the board
+- **Check and checkmate detection** — game state is displayed in real time
+- **Runs entirely in the browser** — no backend, no API calls; the js-chess-engine AI computes moves directly in the browser tab
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> **Note:** When using custom configuration with high depth values, the AI computation runs on the main thread and may freeze or crash the browser tab.
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+Built with React + Vite.
