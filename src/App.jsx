@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Game } from 'js-chess-engine'
+import enginePkg from 'js-chess-engine/package.json'
 import './App.css'
 
 const PIECE_UNICODE = {
@@ -9,6 +10,9 @@ const PIECE_UNICODE = {
 
 const FILES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1']
+
+// Level 5 defaults for custom config
+const CUSTOM_DEFAULTS = { depth: 4, extended: 3, quiescence: 4, check: true, ttSizeMB: 20 }
 
 function isWhite(piece) {
   return piece === piece.toUpperCase()
@@ -27,14 +31,20 @@ export default function App() {
   const [status, setStatus] = useState('Your turn (White)')
   const [aiThinking, setAiThinking] = useState(false)
   const [lastMove, setLastMove] = useState(null)
+  const [configMode, setConfigMode] = useState('level')
   const [aiLevel, setAiLevel] = useState(3)
-  const [ttSizeMB, setTtSizeMB] = useState(16)
-  const [warnDismissed, setWarnDismissed] = useState(false)
+  const [custom, setCustom] = useState(CUSTOM_DEFAULTS)
 
-  const doAiMove = useCallback((g, level, tt) => {
+  const doAiMove = useCallback((g, mode, level, cust) => {
     setAiThinking(true)
     setTimeout(() => {
-      const result = g.ai({ level, ttSizeMB: tt })
+      const aiOpts = mode === 'level'
+        ? { level }
+        : {
+            depth: { base: cust.depth, extended: cust.extended, quiescence: cust.quiescence, check: cust.check },
+            ttSizeMB: cust.ttSizeMB,
+          }
+      const result = g.ai(aiOpts)
       const [from, to] = Object.entries(result.move)[0]
       setLastMove({ from, to })
       const cfg = result.board
@@ -70,7 +80,7 @@ export default function App() {
           setStatus('Checkmate! You win!')
         } else {
           setStatus('AI thinking...')
-          doAiMove(game, aiLevel, ttSizeMB)
+          doAiMove(game, configMode, aiLevel, custom)
         }
       } else {
         const piece = config.pieces[sq]
@@ -89,7 +99,7 @@ export default function App() {
         setValidMoves(getMovesForSquare(game, sq))
       }
     }
-  }, [aiThinking, config, game, selected, validMoves, doAiMove, aiLevel, ttSizeMB])
+  }, [aiThinking, config, game, selected, validMoves, doAiMove, configMode, aiLevel, custom])
 
   const resetGame = () => {
     const g = new Game()
@@ -102,49 +112,119 @@ export default function App() {
     setLastMove(null)
   }
 
+  const updateCustom = (key, val) => setCustom(prev => ({ ...prev, [key]: val }))
+
+  const aiLabel = configMode === 'level' ? `Level ${aiLevel}` : 'Custom'
+
   return (
     <div className="app">
-      {!warnDismissed && (
-        <div className="banner">
-          <span>
-            Browser AI search uses a transposition table — defaults: L1=0.5 MB, L2=1 MB, L3=4 MB, L4=16 MB, L5=40 MB.
-            Browsers may cap available memory, weakening play at higher levels. Raise the TT limit below if needed.
-          </span>
-          <button className="banner-close" onClick={() => setWarnDismissed(true)}>✕</button>
-        </div>
-      )}
-      <h1>Chess — Human vs AI (Level {aiLevel})</h1>
+
+      <h1>js-chess-engine <span className="version">v{enginePkg.version}</span> — Human vs AI ({aiLabel})</h1>
       <div className={`status ${config.checkMate ? 'status-end' : aiThinking ? 'status-ai' : ''}`}>
         {status}
       </div>
-      <div className="controls">
-        <div className="level-select">
-          <span>AI Level:</span>
-          {[1, 2, 3, 4, 5].map(lvl => (
-            <button
-              key={lvl}
-              className={`level-btn ${aiLevel === lvl ? 'active' : ''}`}
-              onClick={() => setAiLevel(lvl)}
+
+      <div className="controls-panel">
+        <div className="mode-tabs">
+          <label className={`mode-tab ${configMode === 'level' ? 'active' : ''}`}>
+            <input
+              type="radio"
+              name="mode"
+              value="level"
+              checked={configMode === 'level'}
+              onChange={() => setConfigMode('level')}
               disabled={aiThinking}
-            >
-              {lvl}
-            </button>
-          ))}
+            />
+            Predefined Level
+          </label>
+          <label className={`mode-tab ${configMode === 'custom' ? 'active' : ''}`}>
+            <input
+              type="radio"
+              name="mode"
+              value="custom"
+              checked={configMode === 'custom'}
+              onChange={() => setConfigMode('custom')}
+              disabled={aiThinking}
+            />
+            Custom Config
+          </label>
         </div>
-        <div className="tt-select">
-          <label htmlFor="tt">TT memory:</label>
-          <input
-            id="tt"
-            type="number"
-            min="1"
-            max="256"
-            value={ttSizeMB}
-            disabled={aiThinking}
-            onChange={e => setTtSizeMB(Math.max(1, Math.min(256, Number(e.target.value))))}
-          />
-          <span>MB</span>
+
+        <div className={`config-section ${configMode !== 'level' ? 'dimmed' : ''}`}>
+          <div className="level-select">
+            <span>AI Level:</span>
+            {[1, 2, 3, 4, 5].map(lvl => (
+              <button
+                key={lvl}
+                className={`level-btn ${aiLevel === lvl ? 'active' : ''}`}
+                onClick={() => setAiLevel(lvl)}
+                disabled={aiThinking || configMode !== 'level'}
+              >
+                {lvl}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={`config-section ${configMode !== 'custom' ? 'dimmed' : ''}`}>
+          {configMode === 'custom' && (
+            <div className="custom-warning">
+              ⚠ Running in the browser — high values may freeze or crash the tab.
+            </div>
+          )}
+          <div className="custom-grid">
+            <div className="custom-field">
+              <label>Depth</label>
+              <input
+                type="number" min="1" max="8"
+                value={custom.depth}
+                disabled={aiThinking || configMode !== 'custom'}
+                onChange={e => updateCustom('depth', Math.max(1, Math.min(8, Number(e.target.value))))}
+              />
+            </div>
+            <div className="custom-field">
+              <label>Ext. Depth</label>
+              <input
+                type="number" min="0" max="3"
+                value={custom.extended}
+                disabled={aiThinking || configMode !== 'custom'}
+                onChange={e => updateCustom('extended', Math.max(0, Math.min(3, Number(e.target.value))))}
+              />
+            </div>
+            <div className="custom-field">
+              <label>Quiescence</label>
+              <input
+                type="number" min="0" max="10"
+                value={custom.quiescence}
+                disabled={aiThinking || configMode !== 'custom'}
+                onChange={e => updateCustom('quiescence', Math.max(0, Math.min(10, Number(e.target.value))))}
+              />
+            </div>
+            <div className="custom-field custom-check">
+              <label>Check ext.</label>
+              <input
+                type="checkbox"
+                checked={custom.check}
+                disabled={aiThinking || configMode !== 'custom'}
+                onChange={e => updateCustom('check', e.target.checked)}
+              />
+            </div>
+            <div className="custom-field">
+              <label>TT Memory</label>
+              <div className="custom-field-row">
+                <input
+                  type="number" min="1" max="256"
+                  value={custom.ttSizeMB}
+                  disabled={aiThinking || configMode !== 'custom'}
+                  onChange={e => updateCustom('ttSizeMB', Math.max(1, Math.min(256, Number(e.target.value))))}
+                />
+                <span className="unit">MB</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="board-wrap">
         <div className="rank-labels">
           {RANKS.map(r => <div key={r} className="label">{r}</div>)}
