@@ -5,8 +5,9 @@
 }
 
 :root {
-  --sq: clamp(56px, 8.5vh, 90px);
+  --sq: clamp(52px, 8vh, 80px);
   --label-size: calc(var(--sq) * 0.38);
+  --board-h: calc(8 * var(--sq) + var(--label-size));
 }
 
 body {
@@ -15,36 +16,61 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 
+/* ── App shell ─────────────────────────────────────── */
+
 .app {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
-  gap: 1rem;
   min-height: 100vh;
+  padding: 1.2rem 1.5rem 1.5rem;
+  gap: 1rem;
 }
 
-
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   color: #e0c97f;
   letter-spacing: 0.05em;
+  text-align: center;
 }
 
 h1 .version {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #888;
   font-weight: normal;
   letter-spacing: 0;
 }
 
+/* ── Three-column layout ────────────────────────────── */
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  gap: 1.2rem;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+/* ── Center ─────────────────────────────────────────── */
+
+.center-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .status {
-  font-size: 1.1rem;
-  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  padding: 0.35rem 1.2rem;
   border-radius: 6px;
   background: #2a2a4a;
   border: 1px solid #444;
-  min-width: 220px;
+  min-width: 200px;
   text-align: center;
   transition: background 0.3s;
 }
@@ -60,6 +86,8 @@ h1 .version {
   color: #f0a0a0;
   font-weight: bold;
 }
+
+/* ── Board ──────────────────────────────────────────── */
 
 .board-wrap {
   display: grid;
@@ -81,7 +109,6 @@ h1 .version {
   grid-area: files;
   display: flex;
   flex-direction: row;
-  margin-left: 0;
 }
 
 .label {
@@ -90,7 +117,7 @@ h1 .version {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #999;
   user-select: none;
 }
@@ -165,22 +192,29 @@ h1 .version {
   pointer-events: none;
 }
 
+/* ── Left sidebar — Controls ────────────────────────── */
+
+.sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .controls-panel {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  width: 100%;
-  max-width: calc(8 * var(--sq) + var(--label-size));
   background: #1e1e38;
   border: 1px solid #333;
   border-radius: 8px;
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 0.9rem;
 }
 
 .mode-tabs {
   display: flex;
-  gap: 0.5rem;
-  padding-bottom: 0.4rem;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid #2a2a4a;
 }
 
@@ -188,10 +222,10 @@ h1 .version {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #aaa;
   border: 1px solid transparent;
   transition: all 0.15s;
@@ -219,49 +253,56 @@ h1 .version {
 
 .level-select {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 0.4rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #aaa;
 }
 
+.level-buttons {
+  display: flex;
+  gap: 0.35rem;
+}
+
 .custom-warning {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #c8a020;
   background: rgba(200, 160, 32, 0.08);
   border: 1px solid rgba(200, 160, 32, 0.3);
   border-left: 3px solid #c8a020;
   border-radius: 4px;
-  padding: 0.4rem 0.6rem;
+  padding: 0.35rem 0.5rem;
   line-height: 1.4;
+  margin-bottom: 0.3rem;
 }
 
 .custom-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.2rem;
-  align-items: flex-end;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 .custom-field {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .custom-field label {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: #888;
+  white-space: nowrap;
 }
 
 .custom-field input[type="number"] {
-  width: 60px;
-  padding: 0.25rem 0.4rem;
+  width: 58px;
+  padding: 0.2rem 0.35rem;
   background: #2a2a4a;
   border: 1px solid #444;
   border-radius: 4px;
   color: #eee;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-align: center;
 }
 
@@ -275,15 +316,14 @@ h1 .version {
 }
 
 .custom-check {
-  align-items: flex-start;
+  align-items: center;
 }
 
 .custom-check input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   accent-color: #e0c97f;
   cursor: pointer;
-  margin-top: 0.1rem;
 }
 
 .custom-field-row {
@@ -293,18 +333,18 @@ h1 .version {
 }
 
 .unit {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #888;
 }
 
 .level-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 2px solid #444;
   background: #2a2a4a;
   color: #ccc;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.15s;
@@ -328,9 +368,9 @@ h1 .version {
 }
 
 .reset-btn {
-  margin-top: 0.5rem;
-  padding: 0.6rem 2rem;
-  font-size: 1rem;
+  padding: 0.55rem 0;
+  width: 100%;
+  font-size: 0.95rem;
   background: #e0c97f;
   color: #1a1a2e;
   border: none;
@@ -341,6 +381,106 @@ h1 .version {
   transition: background 0.2s;
 }
 
-.reset-btn:hover {
+.reset-btn:hover:not(:disabled) {
   background: #f0d98f;
+}
+
+.reset-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Right sidebar — History ────────────────────────── */
+
+.sidebar-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-panel {
+  background: #1e1e38;
+  border: 1px solid #333;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--board-h);
+  overflow: hidden;
+}
+
+.history-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #888;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid #2a2a4a;
+  flex-shrink: 0;
+}
+
+.history-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 4px;
+}
+.history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.history-list::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 2px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  font-family: 'Courier New', monospace;
+}
+
+.history-num {
+  color: #555;
+  padding: 0.22rem 0.3rem 0.22rem 0.6rem;
+  text-align: right;
+  width: 28px;
+  user-select: none;
+  vertical-align: middle;
+  font-size: 0.75rem;
+}
+
+.history-cell {
+  padding: 0.22rem 0.5rem;
+  cursor: pointer;
+  color: #bbb;
+  vertical-align: middle;
+  border-radius: 3px;
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.history-cell:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #eee;
+}
+
+.history-cell.active {
+  background: rgba(224, 201, 127, 0.18);
+  color: #e0c97f;
+  font-weight: bold;
+}
+
+.history-start {
+  color: #666;
+  font-style: italic;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 0.8rem;
+}
+
+.history-empty {
+  cursor: default;
 }
